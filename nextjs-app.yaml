@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextjs-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+        app: next-es
+  template:
+    metadata:
+      labels:
+        app: next-es
+    spec:
+      containers:
+      - name: nextjs
+        image: denkochev/einfache-sprache:1.0
+        envFrom:
+        - secretRef:
+            name: nextjs-env-secret
+        resources:
+          requests:
+            cpu: 100m
+            memory: 300Mi
+        ports:
+        - containerPort: 3000
+      imagePullSecrets:
+      - name: docker-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextjs-service
+spec:
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  # type: LoadBalancer
+  #type: LoadBalancer
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    # the port that container runs on
+    targetPort: 3000
+  selector:
+    app: next-es
