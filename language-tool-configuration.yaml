@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lt-config
+data:
+  langtool_pipelinePrewarming: "true"
+  Java_Xms: "1g"
+  Java_Xmx: "2g"
