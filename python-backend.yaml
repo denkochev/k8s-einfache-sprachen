@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: python-backend
+  template:
+    metadata:
+      labels:
+        app: python-backend
+    spec:
+      containers:
+      - name: python-backend
+        image: denkochev/python_service:1.0
+        env:
+        - name: LANGUAGETOOL_URL
+          value: "lt-service"
+        - name: LANGUAGETOOL_PORT
+          value: "80"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+        ports:
+        - containerPort: 8000
+      imagePullSecrets:
+      - name: docker-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pythone-back-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 8000
+  selector:
+    app: python-backend
