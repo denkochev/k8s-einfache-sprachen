@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: language-tool
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+        app: language-tool
+  template:
+    metadata:
+      labels:
+        app: language-tool
+    spec:
+      containers:
+      - name: language-tool
+        image: denkochev/language-tool-k8smodifed:1.0
+        env:
+          - name: langtool_pipelinePrewarming
+            valueFrom:
+              configMapKeyRef:
+                name: lt-config
+                key: langtool_pipelinePrewarming
+          - name: Java_Xms
+            valueFrom:
+              configMapKeyRef:
+                name: lt-config
+                key: Java_Xms
+          - name: Java_Xmx
+            valueFrom:
+              configMapKeyRef:
+                name: lt-config
+                key: Java_Xmx
+        resources:
+          requests:
+            cpu: 100m
+            memory: 2300Mi
+        ports:
+        - containerPort: 8010
+      imagePullSecrets:
+      - name: docker-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lt-service
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 80
+    # the port that container runs on
+    targetPort: 8010
+  selector:
+    app: language-tool
